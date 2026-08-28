@@ -68,7 +68,10 @@ def NaschCA(s, V, l, n, Vmax, T, thresh=0.5):
     return B_arr, Vel_arr
 
 def NaschCA_twoClass(s, V, C, l, n, Vmax, T, thresh=0.5, penetration=0.1,
-                     headway_HDV=1, headway_AV=0):
+                     headway_HDV=1, headway_AV=0, thresh_AV=None):
+    
+    if thresh_AV is None:
+        thresh_AV = thresh
     def randomAllotVehicles(s):
         ctr = 0
         s = [0] * l
@@ -126,8 +129,9 @@ def NaschCA_twoClass(s, V, C, l, n, Vmax, T, thresh=0.5, penetration=0.1,
 
             V_new[i] = min(V[i] + 1, Vmax) #acceleration
             V_new[i] = min(V_new[i], eff_gap) #deceleration
+            p_brake = thresh_AV if C[i] == 1 else thresh #class-specific braking prob
             p = np.random.random() #random braking
-            if(p < thresh):
+            if(p < p_brake):
                 V_new[i] = max(V_new[i] - 1, 0)
 
             target = (i + V_new[i]) % l

@@ -9,6 +9,7 @@ if __name__ == "__main__":
     Vmax = 5
     T = 1000
     thresh = 0.25
+    thresh_AV = 0.15
     n = 50
     headway_HDV = 1
     headway_AV = 0
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     flows = []
 
     for pen in penetrations:
-        runs = [measure_steady_state_flow(l, n, Vmax, T, thresh, pen, headway_HDV, headway_AV) for _ in range(n_runs)]
+        runs = [measure_steady_state_flow(l, n, Vmax, T, thresh, pen, headway_HDV, headway_AV, thresh_AV) for _ in range(n_runs)]
         flows.append(np.mean(runs))
         print(f"penetration={pen:.1f}  flow={np.mean(runs):.4f}")
 

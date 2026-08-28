@@ -41,11 +41,13 @@ def diagnose_transient(l, n, Vmax, T, thresh, chunk_size=25):
     plt.show()
     return chunk_flows
 
-def measure_steady_state_flow(l, n, Vmax, T, thresh, pen = 0.0, headway_HDV = 1, headway_AV = 0, chunk_size=25, transient_chunks=5):
+def measure_steady_state_flow(l, n, Vmax, T, thresh, pen = 0.0, headway_HDV = 1, headway_AV = 0,
+                               thresh_AV=None, chunk_size=25, transient_chunks=5):
     s = []
     V = []
     C = []
-    B_arr, Vel_arr, C_arr = NaschCA_twoClass(s, V, C, l, n, Vmax, T, thresh, pen, headway_HDV, headway_AV)
+    B_arr, Vel_arr, C_arr = NaschCA_twoClass(s, V, C, l, n, Vmax, T, thresh, pen, headway_HDV, headway_AV,
+                                              thresh_AV=thresh_AV)
     chunk_flows = chunk_mean_flow(B_arr, Vel_arr, chunk_size, l)
     steady_chunks = chunk_flows[transient_chunks:]
     return np.mean(steady_chunks)
