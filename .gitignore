@@ -1,3 +1,17 @@
+# --- local only: secrets, editor/assistant tooling, private notes ---
 .env
+.claude/
+.claudeignore
+temporaryRecords/
+
+# --- python caches (numba's compiled cache also lands in __pycache__) ---
 __pycache__/
-BasicFunctions/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# --- raw PeMS downloads: large, and re-downloadable (see data/raw/README.md) ---
+data/raw/*
+!data/raw/README.md
+
+# --- large intermediate outputs that the scripts regenerate ---
+results/cache/
