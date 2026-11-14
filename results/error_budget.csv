@@ -1,0 +1,9 @@
+choice,kind,log_pct,log_lo,log_hi,points,points_lo,points_hi
+Capacity definition (ring peak vs queue discharge),switch,8.8,7.9,8.8,15.3,14.0,16.5
+Baseline model (CA vs fitted triangle),switch,4.4,4.0,4.8,7.7,7.0,8.3
+"Calibration lane (lane 1 vs lane 2, same detector)",switch,7.8,6.2,10.1,13.5,10.6,17.8
+Calibration detector (which detector),spread,26.6,22.0,32.5,47.6,38.4,59.4
+"Calibration day (same detector, another weekday)",spread,10.8,9.7,12.1,19.1,17.2,21.5
+"Estimation error (one detector, one day)",spread,9.7,8.8,11.1,17.6,15.4,19.8
+AV encoded in cells (inherits the human fit),spread,24.1,22.2,27.1,46.2,40.4,51.6
+AV time-gap assumption (0.6 s vs 1.5 s),switch,73.6,73.6,73.6,137.3,135.1,140.1

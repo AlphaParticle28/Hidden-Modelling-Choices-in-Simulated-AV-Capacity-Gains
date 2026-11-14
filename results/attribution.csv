@@ -1,0 +1,13 @@
+model,r2,adj_r2,n_detectors
+corridor,0.222,0.156,350
+lanes,0.016,-0.002,350
+lane-1 share,0.000,-0.003,350
+lanes + lane-1 share + free speed,0.057,0.035,350
+corridor + lanes + lane-1 share + free speed,0.278,0.197,350
+corridor (metadata sample),0.222,0.156,350
+corridor + metadata lanes,0.246,0.167,350
+corridor + ramp distances,0.223,0.153,350
+corridor + next to bottleneck,0.231,0.164,350
+"corridor + position (lanes, ramps, bottleneck)",0.257,0.172,350
+corridor (HOV sample),0.227,0.161,342
+corridor + lane-1 speed advantage,0.250,0.183,342

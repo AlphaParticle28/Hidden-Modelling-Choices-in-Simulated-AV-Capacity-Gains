@@ -1,0 +1,8 @@
+,value
+station_days,637.0
+detectors,226.0
+spearman_lane1_vs_lane2,0.12709517134991344
+spearman_within_corridor,0.1582360186589952
+sd_lane1,173.61157914814567
+sd_lane2,151.33887773132088
+median_lane2_over_lane1,0.9840774578434794
