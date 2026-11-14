@@ -1,0 +1,10 @@
+,value
+scored,876.0
+congested_test_geh_balanced,3.2435588260700783
+congested_test_geh_original,3.5012999999999996
+congested_test_geh_triangle,3.3455500000000002
+share_balanced_better_than_triangle,0.5536529680365296
+capacity_spearman_balanced_vs_original,0.844665090563015
+capacity_ratio_balanced_to_original,0.9983913385855504
+detector_sd_balanced,183.63802594923473
+day_sd_balanced,66.91159897892439

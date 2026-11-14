@@ -13,5 +13,8 @@ __pycache__/
 data/raw/*
 !data/raw/README.md
 
+# --- cleaned interval data (~20 MB): rebuilt from data/raw by scripts/03_prepare_data.py ---
+data/processed/
+
 # --- large intermediate outputs that the scripts regenerate ---
 results/cache/
