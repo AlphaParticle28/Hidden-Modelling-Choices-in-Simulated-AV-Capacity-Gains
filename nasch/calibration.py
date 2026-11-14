@@ -161,6 +161,7 @@ def fit_station_day(lib, discharge, k, q, times, n_boot=500, block=12, seed=0,
     see `split_column`.
     """
     k, q = np.asarray(k, float), np.asarray(q, float)
+    dt_grid = np.asarray(dt_grid, float)               # a list or tuple works too
     n, n_dt = k.size, len(dt_grid)
     G = geh_matrix(model_flow(lib, k * CELL_KM), q, dt_grid)
     vmax = lib.grid["vmax"].to_numpy()

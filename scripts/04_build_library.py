@@ -8,6 +8,7 @@
 
 Progress is saved as it goes; re-running the script resumes where it stopped.
 """
+import os
 import sys
 import time
 from pathlib import Path
@@ -34,6 +35,21 @@ def log(msg):
     print(time.strftime("%H:%M:%S"), msg, flush=True)
 
 
+def save_npz(path, compressed=False, **arrays):
+    """Write to a temporary file next to `path`, then swap it in, so an interruption never leaves a
+    half-written file that a re-run would trust. The temporary name ends in .npz so numpy keeps it."""
+    tmp = path.with_name(path.stem + ".tmp.npz")
+    (np.savez_compressed if compressed else np.savez)(tmp, **arrays)
+    os.replace(tmp, path)
+
+
+def save_csv(frame, path, **kwargs):
+    """Same idea for a CSV."""
+    tmp = path.with_name(path.name + ".tmp")
+    frame.to_csv(tmp, **kwargs)
+    os.replace(tmp, path)
+
+
 if part in ("library", "all") and not LIB.exists():
     flow = np.full((len(grid), rho.size, len(LIBRARY_SEEDS)), np.nan)
     if LIB_PARTIAL.exists():
@@ -44,13 +60,13 @@ if part in ("library", "all") and not LIB.exists():
     for k, i in enumerate(todo, 1):
         flow[i] = simulate_fd(grid.iloc[i])
         if k % 50 == 0 or k == todo.size:
-            np.savez(LIB_PARTIAL, flow=flow)
+            save_npz(LIB_PARTIAL, flow=flow)
             rate = (time.time() - t0) / k
             log(f"library: {len(grid) - todo.size + k}/{len(grid)}  ({rate:.1f} s each, "
                 f"~{rate * (todo.size - k) / 60:.0f} min left)")
-    np.savez_compressed(LIB, flow=flow, rho=rho, vmax=grid["vmax"].to_numpy(),
-                        p=grid["p"].to_numpy(), p0=grid["p0"].to_numpy(), h=grid["h"].to_numpy(),
-                        seeds=np.array(list(LIBRARY_SEEDS)))
+    save_npz(LIB, compressed=True, flow=flow, rho=rho, vmax=grid["vmax"].to_numpy(),
+             p=grid["p"].to_numpy(), p0=grid["p0"].to_numpy(), h=grid["h"].to_numpy(),
+             seeds=np.array(list(LIBRARY_SEEDS)))
     LIB_PARTIAL.unlink(missing_ok=True)
     log(f"library saved: {LIB}")
 
@@ -67,7 +83,7 @@ if part in ("discharge", "all"):
                          discharge=mean, discharge_se=se, runs=runs,
                          av_gain=av_gain(int(r["vmax"]), mean)))
         if k % 25 == 0 or i == len(grid) - 1:
-            pd.DataFrame(rows).to_csv(DIS, index=False, float_format="%.6f")
+            save_csv(pd.DataFrame(rows), DIS, index=False, float_format="%.6f")
             rate = (time.time() - t0) / k
             log(f"discharge: {i + 1}/{len(grid)}  ({rate:.1f} s each, "
                 f"~{rate * (len(grid) - i - 1) / 60:.0f} min left)")

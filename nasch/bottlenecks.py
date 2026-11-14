@@ -19,7 +19,8 @@ from scipy.stats import binom
 
 from . import paths
 
-# detection rule (speeds in km/h): upstream in a queue, downstream much faster, detectors close
+# detection rule (speeds in km/h): upstream in a queue, downstream free-flowing (>= 40 mph) and much faster,
+# detectors close
 QUEUE_SPEED = 40 * 1.609344          # 40 mph
 SPEED_DIFFERENCE = 20 * 1.609344     # 20 mph
 MAX_SPACING_KM = 2 * 1.609344        # 2 miles (Chen et al. 2004)
@@ -131,8 +132,10 @@ def active_mask(v_up, v_down):
     """Interval-by-interval bottleneck activity between two detectors, from all-lane station speeds.
     The rule must hold in at least 5 of 7 consecutive intervals. Within such a window, everything from
     the first to the last interval where the rule holds counts as active, so a single missed interval
-    does not split one event, while the event does not spill past its real start or end."""
-    rule = (v_up < QUEUE_SPEED) & (v_down - v_up > SPEED_DIFFERENCE)
+    does not split one event, while the event does not spill past its real start or end.
+    The downstream detector must be out of the queue too: a large speed difference between two queued
+    detectors is not a bottleneck between them."""
+    rule = (v_up < QUEUE_SPEED) & (v_down >= QUEUE_SPEED) & (v_down - v_up > SPEED_DIFFERENCE)
     need, window = PERSIST
     hits = pd.Series(rule.astype(float)).rolling(window, min_periods=window).sum().to_numpy()
     active = np.zeros(len(rule), bool)

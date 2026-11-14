@@ -94,6 +94,14 @@ def test_library_without_every_h_value_still_fits():
     assert out["h"] == 0 and np.isnan(out["geh_best_h1"]) and np.isnan(out["geh_best_h2"])
 
 
+def test_custom_dt_grid_as_a_list():
+    lib = triangle_library()
+    k, times = a_day()
+    q = 3600 * model_flow(lib, k * CELL_KM)[:, 1] / 1.2
+    out, _ = fit_station_day(lib, np.full(5, 0.5), k, q, times, n_boot=10, dt_grid=[0.8, 1.0, 1.2])
+    assert out["dt"] == pytest.approx(1.2) and out["dt_lo"] == pytest.approx(1.2)
+
+
 def test_forcing_the_wrong_buffer_costs_fit():
     lib = triangle_library()
     k, times = a_day()

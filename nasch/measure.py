@@ -74,18 +74,32 @@ def queue_discharge_rate(vmax, human, av=AV, penetration=0.0, n_queue=DISCHARGE_
     return est
 
 
+def default_densities(vmax):
+    """0.05 up to at least 1/(vmax+1) in steps of 0.005; the original 0.05-0.255 grid for vmax >= 3."""
+    return np.arange(0.05, max(0.255, 1.0 / (vmax + 1) + 0.005) + 1e-9, 0.005)
+
+
 def fd_peak(L, vmax, human, av=AV, penetration=0.0, densities=None, steps=2000,
             transient=None, seeds=range(8)):
     """Peak of the ring fundamental diagram (the literature-style capacity), for comparison.
 
     Returns (peak flow, density at the peak, densities used, mean flow at each density).
-    Note: the maximum of noisy averages is biased slightly upward."""
+    Note: the maximum of noisy averages is biased slightly upward.
+
+    The default densities run from 0.05 to at least 1/(vmax+1), the deterministic model's critical
+    density; random slowing, slow-to-start and extra gaps only move the peak to lower densities. (For
+    vmax >= 3 this is the original 0.05-0.255 grid.) If the highest flow sits on the last density
+    of the grid, the true peak may lie beyond it, so this raises instead of returning a truncated value.
+    (Only the upper edge is guarded: with the 0.05 floor the peak cannot sit on the lowest density.)"""
     if densities is None:
-        densities = np.arange(0.05, 0.26, 0.005)
+        densities = default_densities(vmax)
     ns = np.unique(np.maximum(1, np.rint(np.asarray(densities) * L).astype(int)))
     if transient is None:
         transient = min(steps // 3, 2000)
     flow = ring_flow(L, ns, vmax, human, av=av, penetration=penetration, steps=steps,
                      transient=transient, seeds=seeds).mean(axis=1)
     k = int(np.argmax(flow))
+    if k == ns.size - 1:
+        raise ValueError(f"the highest flow is at the largest density tried ({ns[-1] / L:.3f}); "
+                         "the peak may lie beyond it, so pass a wider `densities` range")
     return float(flow[k]), float(ns[k] / L), ns / L, flow

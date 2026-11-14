@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 from nasch.baseline import fit_triangle, predict_triangle
-from nasch.bottlenecks import (QUEUE_SPEED, active_mask, episodes, measure_pair, median_interval, ramp_distances,
+from nasch.bottlenecks import (QUEUE_SPEED, SPEED_DIFFERENCE, active_mask, episodes, measure_pair, median_interval, ramp_distances,
                                ramps_between)
 
 
@@ -52,6 +52,15 @@ def test_short_blips_are_not_bottlenecks():
     down = np.full(60, 100.0)
     up[10:13] = QUEUE_SPEED - 5           # only 3 intervals
     down[10:13] = 100.0
+    assert not active_mask(up, down).any()
+
+
+def test_both_detectors_queued_is_not_a_bottleneck():
+    up = np.full(60, 100.0)
+    down = np.full(60, 100.0)
+    up[10:40] = 10.0                      # deep queue upstream ...
+    down[10:40] = 50.0                    # ... and still queued downstream (below QUEUE_SPEED)
+    assert down[10] < QUEUE_SPEED and down[10] - up[10] > SPEED_DIFFERENCE
     assert not active_mask(up, down).any()
 
 

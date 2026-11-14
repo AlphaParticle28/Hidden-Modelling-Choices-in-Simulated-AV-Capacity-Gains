@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from nasch.measure import discharge_rates, fd_peak, queue_discharge_rate
+from nasch.measure import default_densities, discharge_rates, fd_peak, queue_discharge_rate
 from nasch.simulator import Driver
 
 
@@ -51,3 +51,20 @@ def test_fd_peak_of_deterministic_model_is_the_triangle_top():
                               steps=3000, seeds=range(2))
     assert peak == pytest.approx(0.8, abs=1e-9)
     assert rho == pytest.approx(0.2, abs=1e-9)
+
+
+def test_fd_peak_default_range_reaches_the_peak_for_small_vmax():
+    peak, rho, _, _ = fd_peak(1000, 1, Driver(p=0.0), steps=3000, seeds=range(2))
+    assert peak == pytest.approx(0.5, abs=1e-9)
+    assert rho == pytest.approx(0.5, abs=1e-9)
+
+
+def test_fd_peak_default_range_is_unchanged_for_vmax_3_and_up():
+    for vmax in (3, 4, 5, 6):
+        np.testing.assert_allclose(default_densities(vmax), np.arange(0.05, 0.26, 0.005), atol=1e-12)
+    assert default_densities(1)[-1] >= 0.5 and default_densities(2)[-1] >= 1 / 3
+
+
+def test_fd_peak_on_the_grid_edge_raises():
+    with pytest.raises(ValueError, match="largest density"):
+        fd_peak(1000, 4, Driver(p=0.0), densities=np.arange(0.05, 0.16, 0.01), steps=500, seeds=range(1))

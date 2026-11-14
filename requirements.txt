@@ -1,6 +1,6 @@
 numpy>=2.0
 pandas>=2.2
-matplotlib>=3.8
+matplotlib>=3.9
 scipy>=1.13
 numba>=0.60
 pytest>=8.0

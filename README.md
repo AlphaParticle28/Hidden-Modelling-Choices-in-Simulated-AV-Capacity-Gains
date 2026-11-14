@@ -44,11 +44,11 @@ Why do detectors on the same corridor differ? Not mainly because of where they s
   within corridors).
 * With the PeMS station metadata I tested position directly. Lane count, distance to the nearest on-
   and off-ramp, and sitting next to a recurring active bottleneck together add almost nothing within
-  a corridor: adjusted R² +0.016, against a bar of 0.10 I set beforehand (+0.006 under my original,
-  looser definition of "next to a bottleneck"). Ramp postmiles are only resolved to the interchange,
-  so this tests position at that scale.
-* A queue detector's *calibrated capacity* does not track the discharge of the bottleneck below it
-  (rank correlation 0.13, n=51).
+  a corridor: adjusted R² +0.015, against a bar of 0.10 I set beforehand (+0.006 under my original,
+  looser definition of "next to a bottleneck", under either detection rule). Ramp postmiles are only
+  resolved to the interchange, so this tests position at that scale.
+* A queue detector's *calibrated capacity* shows no detectable tracking of the discharge of the
+  bottleneck below it (rank correlation 0.08, 95% interval −0.29 to 0.39, n=48).
 * All the descriptors together explain only about a fifth of the spread.
 
 So the differences are mostly specific to the lane and the loop: persistent measurement error in
@@ -112,20 +112,23 @@ almost an identity here, because density is computed as flow divided by speed.
   2.4% (median), but misses by more than 5% on 21% of days.
 * **Against flow measured below real bottlenecks, its capacities come out higher, but this check is
   one-sided.** Using PeMS postmiles, I flagged active bottlenecks: a queue at one detector and free
-  flow at the next, at the same time (Chen et al. 2004). While one is active, the lane-1 flow at the
-  free-flowing detector is the discharge.
-  * The flagged queues are dense (upstream occupancy about 22%). The median capacity drop is 7%, but
+  flow (at least 40 mph) at the next, at the same time (after Chen et al. 2004). While one is active,
+  the lane-1 flow at the free-flowing detector is the discharge.
+  * The flagged queues are dense (upstream occupancy about 22%). The median capacity drop is 6%, but
     a third of episodes show none, so on 5-minute lane-1 data this is only a rough check.
-  * There are 47 bottlenecks whose free-flowing detector was also calibrated. There, the calibrated
-    capacity is a median 23% above the lane-1 flow the detector carries (95% interval 13-47%,
-    resampling corridors), and it ranks those flows only weakly (rank correlation 0.42).
+  * There are 45 bottlenecks whose free-flowing detector was also calibrated. There, the calibrated
+    capacity is a median 23% above the lane-1 flow the detector carries (95% interval 13-54%,
+    resampling corridors), and it ranks those flows only weakly (rank correlation 0.43).
   * At the 7 cleanest of them (recurring, well observed, no off-ramp in between), the gap is 13%
     (exact 95% interval -1% to +43%). That is too few to tell from zero.
   * But a free-flowing detector below a bottleneck need not be at capacity, and its lane 1 need not be
-    saturated: a quarter of these sites carry under 1,000 veh/h in lane 1. So "higher" is the expected
-    sign, and the check bounds the error rather than measuring it. Only 5 of the 47 detectors show the
-    opposite, by at most 9.5%.
-  * A fitted triangle behaves the same way (28% higher; 3 of 46 the other way).
+    saturated: over a quarter of these sites carry under 1,000 veh/h in lane 1. So "higher" is the
+    expected sign, and the check bounds the error rather than measuring it. Only 5 of the 45 detectors
+    show the opposite, by at most 9.5%.
+  * A fitted triangle behaves the same way (28% higher; 3 of 44 the other way).
+  * My first version of the detection rule did not check that the downstream detector was out of the
+    queue. With it, the same comparison gave n=47, a 95% interval of 13-47% and rank correlation 0.42
+    (queue detector: 0.13, n=51). The median gap, the 7 cleanest sites and the conclusions are unchanged.
 * **Why a CA at all, then?** Because AV capacity studies often use this class of model, which is
   what makes point 2 matter. Here the CA is the object of study, not a better tool.
 
@@ -188,7 +191,7 @@ error rather than measuring it.
   set-up move the answer. It does not predict real AVs. The AV formula assumes the AV accelerates
   without limit, and it uses PeMS's partly assumed free-flow speed (about 119 km/h).
 * **The capacities are not checked against a true bottleneck capacity.** Below active bottlenecks
-  they sit above the measured lane-1 discharge (median 23%, n=47). That is the expected direction for
+  they sit above the measured lane-1 discharge (median 23%, n=45). That is the expected direction for
   a one-sided check, so it bounds the error rather than measuring it.
   * If part of that gap is real error, the human baseline is too high, and the absolute AV gains in
     point 2 are understated rather than overstated.

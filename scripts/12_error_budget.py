@@ -102,15 +102,25 @@ def budget(kk, gg, bb, ll):
 point = budget(k, gap, base, lane2)
 rng = np.random.default_rng(9)
 corrs = k["corridor"].unique()
+corridor_keys = k[["station", "date", "corridor"]].drop_duplicates()
+
+
+def split_by_corridor(table):
+    """The rows of `table` that belong to each corridor's kept station-days, so that a corridor drawn
+    twice in a bootstrap replicate contributes its rows twice, as it does in the main table."""
+    t = table.merge(corridor_keys, on=["station", "date"])
+    return {c: t[t["corridor"] == c] for c in corrs}
+
+
+gap_c, base_c, lane2_c = split_by_corridor(gap), split_by_corridor(base), split_by_corridor(lane2)
 boots = []
 for _ in range(500):
     pick = rng.choice(corrs, corrs.size, replace=True)
     kk = pd.concat([k[k["corridor"] == c].assign(station=lambda d, j=j: d["station"].astype(str) + f"#{j}")
                     for j, c in enumerate(pick)])
-    keys = set(zip(kk["station"].str.split("#").str[0].astype(int), kk["date"]))
-    gg = gap[[(s, d) in keys for s, d in zip(gap["station"], gap["date"])]]
-    bb = base[[(s, d) in keys for s, d in zip(base["station"], base["date"])]]
-    ll = lane2[[(s, d) in keys for s, d in zip(lane2["station"], lane2["date"])]]
+    gg = pd.concat([gap_c[c] for c in pick])
+    bb = pd.concat([base_c[c] for c in pick])
+    ll = pd.concat([lane2_c[c] for c in pick])
     boots.append(budget(kk, gg, bb, ll))
 boots = np.array(boots)
 lo, hi = np.percentile(boots, [2.5, 97.5], axis=0)
