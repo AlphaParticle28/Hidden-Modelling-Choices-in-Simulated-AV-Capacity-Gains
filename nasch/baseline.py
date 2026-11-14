@@ -1,7 +1,10 @@
 """A simple, simulation-free benchmark: a triangular fundamental diagram fitted directly to the data.
 
-Free branch q = vf * k through the origin; congested branch q = a + b * k (b < 0). The breakpoint
-between the two is chosen by least squares. The queue-discharge capacity estimate is the apex, the
+Free branch q = vf * k through the origin; congested branch q = a + b * k (b < 0). For each candidate
+breakpoint the two branches are fitted to the data on either side of it, and the candidate whose
+prediction, min(vf * k, a + b * k), has the smallest squared error is kept: fit by split, select by
+prediction. This is not a continuous least-squares triangle, but on the PeMS data a continuous fit
+gives capacities within 0.3% at the median. The queue-discharge capacity estimate is the apex, the
 point where the congested branch meets the free branch. In kinematic-wave terms that is the state
 leaving an active bottleneck: on the free branch, at the highest flow the queue can sustain.
 Pre-breakdown peaks that sit above the congested line are therefore not counted as capacity.
@@ -28,7 +31,8 @@ def fit_triangle(k, q, n_breaks=50, min_points=8, k_jam=None):
             a, b = w * k_jam, -w
         if b >= 0:
             continue
-        sse = ((q[free] - vf * k[free]) ** 2).sum() + ((q[cong] - (a + b * k[cong])) ** 2).sum()
+        # score the candidate by the prediction it actually makes (branches meet at the apex, not at kc)
+        sse = ((q - predict_triangle(dict(vf=vf, a=a, b=b), k)) ** 2).sum()
         if best is None or sse < best[0]:
             best = (sse, vf, a, b)
     if best is None:

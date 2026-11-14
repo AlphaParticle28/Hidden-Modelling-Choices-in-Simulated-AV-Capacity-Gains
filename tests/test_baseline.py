@@ -30,6 +30,26 @@ def test_fixed_jam_density_is_respected():
     assert predict_triangle(fit, np.array([200.0]))[0] == 0.0
 
 
+def test_chosen_triangle_has_the_smallest_prediction_error():
+    # noisy data with a capacity drop: pre-breakdown flows sit above the congested line, so the split
+    # density kc and the apex differ; the fit must be the best by its own prediction
+    rng = np.random.default_rng(0)
+    k, q, cap = triangle_data()
+    q = q + rng.normal(0, 60, k.size)
+    q[(k > 12) & (k < 15)] += 600        # scoring by the split at kc instead picks a fit with 2x this error
+    fit = fit_triangle(k, q)
+    assert fit["capacity"] == pytest.approx(cap, rel=0.05)   # old scoring: -9.5%
+    sse_fit = ((q - predict_triangle(fit, k)) ** 2).sum()
+    for kc in np.quantile(k, np.linspace(0.10, 0.90, 50)):
+        free, cong = k < kc, k >= kc
+        if free.sum() < 8 or cong.sum() < 8:
+            continue
+        vf = (q[free] * k[free]).sum() / (k[free] ** 2).sum()
+        b, a = np.polyfit(k[cong], q[cong], 1)
+        if b < 0:
+            assert sse_fit <= ((q - predict_triangle(dict(vf=vf, a=a, b=b), k)) ** 2).sum() + 1e-6
+
+
 def test_no_congested_branch_gives_none():
     k = np.linspace(1, 20, 100)
     assert fit_triangle(k, 100 * k) is None or fit_triangle(k, 100 * k)["capacity"] > 0

@@ -50,15 +50,19 @@ out = {}
 # ---------------------------------------------------------------- 1. nested variance decomposition
 # corridor (freeway + direction) > detector within corridor > day within detector (incl. estimation)
 def decompose(df):
-    """Method-of-moments variance components (corridor, detector within corridor, day)."""
+    """Method-of-moments variance components (corridor, detector within corridor, day).
+    A detector's mean over d days carries day noise W/d. Each corridor's spread of detector means is
+    corrected by that corridor's own mean noise, and a corridor mean's variance is
+    vc + (vs + that mean noise) / n, so the correction is averaged the same way as the term it fixes."""
     s = df.groupby("station").agg(C=("capacity_vph", "mean"), days=("capacity_vph", "size"),
                                   corridor=("corridor", "first"))
     m = df.groupby("station").filter(lambda g: len(g) >= 2)
     w = m.groupby("station")["capacity_vph"].var(ddof=1).mean()
-    noise = (w / s["days"]).mean()
-    c = s.groupby("corridor").agg(m=("C", "mean"), n=("C", "size"), v=("C", "var"))
-    vs = max(c.loc[c["n"] >= 2, "v"].mean() - noise, 0.0)
-    vc = max(c["m"].var(ddof=1) - ((vs + noise) / c["n"]).mean(), 0.0)
+    s["noise"] = w / s["days"]
+    c = s.groupby("corridor").agg(m=("C", "mean"), n=("C", "size"), v=("C", "var"), noise=("noise", "mean"))
+    multi = c[c["n"] >= 2]
+    vs = max((multi["v"] - multi["noise"]).mean(), 0.0)
+    vc = max(c["m"].var(ddof=1) - ((vs + c["noise"]) / c["n"]).mean(), 0.0)
     return vc, vs, w
 
 

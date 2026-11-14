@@ -21,7 +21,7 @@ answer by about a third as much:
 
 For scale, the calibration day spreads the gain by about 19 points and the estimation error by 18.
 Switching the capacity definition shifts it by 15, calibrating lane 2 instead of lane 1 at the same
-detector by 14, and switching from the CA to a simple fitted triangle by 8. The right-hand panel
+detector by 14, and switching from the CA to a simple fitted triangle by 7.5. The right-hand panel
 shows the same quantities as percentage changes in the capacity ratio, which do not depend on the
 AV assumed.
 
@@ -36,7 +36,7 @@ resampling corridors):
 * 15% (11-22%) is between weekdays at the same detector, including estimation error.
 
 The spread is not a quirk of the cellular automaton: a triangle fitted directly to the same data
-shows it too (SD across detectors 202 veh/h, against 170 for the CA).
+shows it too (SD across detectors 192 veh/h, against 170 for the CA).
 
 Why do detectors on the same corridor differ? Not mainly because of where they sit along it:
 * Calibrating lane 2 at the same stations (637 detector-days) gives a similar spread between
@@ -98,18 +98,19 @@ almost an identity here, because density is computed as flow divided by speed.
 
 * **It fits congestion as well as simpler alternatives, not better.** Calibrated on all intervals
   (80% free flow), the CA does worse on held-out congested hours (GEH 3.50) than a fitted triangle
-  (3.29) or a model-free lookup of nearby observations (3.23). Weighting free flow and congestion
-  equally in the calibration brings it level with both (3.24). Its capacities barely change (median
+  (3.35) or a model-free lookup of nearby observations (3.23). Weighting free flow and congestion
+  equally in the calibration brings it level with the lookup and slightly ahead of the triangle (3.24;
+  better than the triangle on 55% of days). Its capacities barely change (median
   ratio 1.00), and the detector spread remains (SD 184 vs 67 veh/h between days).
 * **Its calibration is detector-specific in a way that lasts, but history predicts better.** A
   detector's calibrated parameters predict a new day better than one parameter set for all detectors
   (GEH 3.9 vs 4.9), and its capacity carries over to the new day (R² 0.46). But a simple lookup of the
   detector's own past data beats the calibrated CA on 83% of new detector-days.
 * **Its capacity level matches a simpler estimate, though not one-for-one.** A fitted triangle gives
-  the same level (median ratio 1.01). By a rule I fixed before comparing (rank correlation ≥ 0.9 and
-  median difference < 3%), the two estimates still disagree: rank correlation 0.81, median difference
+  the same level (median ratio 1.03). By a rule I fixed before comparing (rank correlation ≥ 0.9 and
+  median difference < 3%), the two estimates still disagree: rank correlation 0.84, median difference
   4.4%. On noise-added triangular data with a known discharge, the calibration recovers it to within
-  2.4% (median), but misses by more than 5% on 21% of days.
+  2.5% (median), but misses by more than 5% on 18% of days.
 * **Against flow measured below real bottlenecks, its capacities come out higher, but this check is
   one-sided.** Using PeMS postmiles, I flagged active bottlenecks: a queue at one detector and free
   flow (at least 40 mph) at the next, at the same time (after Chen et al. 2004). While one is active,
@@ -125,7 +126,7 @@ almost an identity here, because density is computed as flow divided by speed.
     saturated: over a quarter of these sites carry under 1,000 veh/h in lane 1. So "higher" is the
     expected sign, and the check bounds the error rather than measuring it. Only 5 of the 45 detectors
     show the opposite, by at most 9.5%.
-  * A fitted triangle behaves the same way (28% higher; 3 of 44 the other way).
+  * A fitted triangle behaves the same way (28% higher; 1 of 44 the other way).
   * My first version of the detection rule did not check that the downstream detector was out of the
     queue. With it, the same comparison gave n=47, a 95% interval of 13-47% and rank correlation 0.42
     (queue detector: 0.13, n=51). The median gap, the 7 cleanest sites and the conclusions are unchanged.
@@ -163,7 +164,8 @@ error rather than measuring it.
 3. **Simulate once, fit everywhere.** 1,980 candidate drivers are simulated once. Physical units enter
    only as scale factors, so the same library fits every detector.
 4. **Fit and uncertainty.** Fitted with GEH on three of every four hours and tested on the fourth,
-   then repeated on 500 block-resampled versions of each day (Künsch 1989).
+   then repeated on 500 block-resampled versions of each day (Künsch 1989). A block is 12 retained
+   5-minute intervals. Every kept day has at least 250 of 288, and 94% of blocks are one unbroken hour.
 5. **Capacity** is the rate at which a 2,000-vehicle standing queue discharges past a detector: the
    slope of the N-curve, as at real bottlenecks (Cassidy & Bertini 1999).
 
@@ -181,9 +183,19 @@ error rather than measuring it.
   only 91% coverage for 95% intervals. I report both rather than pick one.
 * **A pre-set agreement test came out negative.** Before comparing the CA's capacities with those of
   a fitted triangle, I fixed what would count as agreement: rank correlation ≥ 0.9 and median
-  difference < 3%. They missed it (0.81 and 4.4%). So the capacity estimate is reported as dependent
-  on the model at about the ±4% level. Separately, on congested held-out data the simpler model fits as
-  well as the CA.
+  difference < 3%. They missed it (0.84 and 4.4%; with the triangle's jam density fixed at the CA's
+  133 veh/km, 0.897 and 4.4%). So the capacity estimate is reported as dependent on the model at about
+  the ±4% level. Separately, on congested held-out data the simpler model fits at least as well as the
+  CA (GEH 3.35 vs 3.50).
+* **The triangle numbers above use a corrected fit.** My first version chose the triangle's breakpoint
+  by a score that split the data at the candidate breakpoint, not at the point where the two fitted
+  lines meet, which is what it predicts. Scoring each candidate by its own prediction moves a quarter
+  of triangle capacities by more than 1%. Before the fix the comparison read: median ratio 1.01, rank
+  correlation 0.81 (0.82 with the jam density fixed), SD across detectors 202, held-out GEH 3.29, 3 of
+  44 below a bottleneck's discharge, a misspecification error of 2.4% (21% of days over 5%), and a
+  baseline-model bar of 7.7 points. The fit is chosen from a finite set of breakpoints, not a
+  continuous least-squares triangle, but a continuous fit gives the same comparison (rank 0.84, median
+  ratio 1.03). No conclusion changes.
 
 ## What it can't tell you
 
