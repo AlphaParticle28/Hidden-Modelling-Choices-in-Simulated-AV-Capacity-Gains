@@ -25,6 +25,7 @@ credible_capacity_drop_median,0.04754363283775048
 credible_capacity_drop_iqr_lo,-0.04145225877613662
 credible_capacity_drop_iqr_hi,0.13401224063743952
 all_same_detector_n,45
+all_same_detector_corridors,15
 all_same_detector_n_model_below_measured,5
 all_same_detector_max_shortfall_pct,9.487713675213671
 all_same_detector_interval,corridor bootstrap
@@ -39,6 +40,7 @@ all_same_detector_abs_rel_diff_lo,0.1344161165425557
 all_same_detector_abs_rel_diff_hi,0.5404863686902379
 all_same_detector_verdict,fails
 all_queue_detector_n,48
+all_queue_detector_corridors,18
 all_queue_detector_n_model_below_measured,9
 all_queue_detector_max_shortfall_pct,24.4466621211182
 all_queue_detector_interval,corridor bootstrap
@@ -53,6 +55,7 @@ all_queue_detector_abs_rel_diff_lo,0.21766534132360554
 all_queue_detector_abs_rel_diff_hi,0.5596313231850116
 all_queue_detector_verdict,fails
 all_triangle_same_detector_n,44
+all_triangle_same_detector_corridors,15
 all_triangle_same_detector_n_model_below_measured,1
 all_triangle_same_detector_max_shortfall_pct,6.0740503323836625
 all_triangle_same_detector_interval,corridor bootstrap
@@ -67,9 +70,10 @@ all_triangle_same_detector_abs_rel_diff_lo,0.1425426442249056
 all_triangle_same_detector_abs_rel_diff_hi,0.6043060481586402
 all_triangle_same_detector_verdict,fails
 credible_same_detector_n,7
+credible_same_detector_corridors,4
 credible_same_detector_n_model_below_measured,1
 credible_same_detector_max_shortfall_pct,1.467022614103597
-credible_same_detector_interval,exact order statistic (median); none for rank correlation
+credible_same_detector_interval,"order statistic (median), assumes independent pairs; none for rank correlation"
 credible_same_detector_spearman,0.28571428571428575
 credible_same_detector_spearman_lo,
 credible_same_detector_spearman_hi,
@@ -81,9 +85,10 @@ credible_same_detector_abs_rel_diff_lo,0.010567745553344166
 credible_same_detector_abs_rel_diff_hi,0.42727183930072266
 credible_same_detector_verdict,undecided
 credible_queue_detector_n,10
+credible_queue_detector_corridors,8
 credible_queue_detector_n_model_below_measured,2
 credible_queue_detector_max_shortfall_pct,24.4466621211182
-credible_queue_detector_interval,exact order statistic (median); none for rank correlation
+credible_queue_detector_interval,"order statistic (median), assumes independent pairs; none for rank correlation"
 credible_queue_detector_spearman,-0.1515151515151515
 credible_queue_detector_spearman_lo,
 credible_queue_detector_spearman_hi,
@@ -95,9 +100,10 @@ credible_queue_detector_abs_rel_diff_lo,0.029002147822905222
 credible_queue_detector_abs_rel_diff_hi,1.4442585614646903
 credible_queue_detector_verdict,undecided
 credible_triangle_same_detector_n,7
+credible_triangle_same_detector_corridors,4
 credible_triangle_same_detector_n_model_below_measured,0
 credible_triangle_same_detector_max_shortfall_pct,0.0
-credible_triangle_same_detector_interval,exact order statistic (median); none for rank correlation
+credible_triangle_same_detector_interval,"order statistic (median), assumes independent pairs; none for rank correlation"
 credible_triangle_same_detector_spearman,0.42857142857142866
 credible_triangle_same_detector_spearman_lo,
 credible_triangle_same_detector_spearman_hi,

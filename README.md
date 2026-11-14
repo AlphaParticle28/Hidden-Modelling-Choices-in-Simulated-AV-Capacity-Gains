@@ -121,7 +121,8 @@ almost an identity here, because density is computed as flow divided by speed.
     capacity is a median 23% above the lane-1 flow the detector carries (95% interval 13-54%,
     resampling corridors), and it ranks those flows only weakly (rank correlation 0.43).
   * At the 7 cleanest of them (recurring, well observed, no off-ramp in between), the gap is 13%
-    (exact 95% interval -1% to +43%). That is too few to tell from zero.
+    (95% interval -1% to +43% if the 7 were independent, but they sit on only 4 corridors, so the
+    real interval is wider). That is too few to tell from zero.
   * But a free-flowing detector below a bottleneck need not be at capacity, and its lane 1 need not be
     saturated: over a quarter of these sites carry under 1,000 veh/h in lane 1. So "higher" is the
     expected sign, and the check bounds the error rather than measuring it. Only 5 of the 45 detectors

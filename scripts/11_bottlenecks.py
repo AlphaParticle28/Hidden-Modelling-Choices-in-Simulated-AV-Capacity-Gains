@@ -12,8 +12,10 @@
    "calibrated capacity < measured discharge" is evidence against the calibration; those cases are
    counted. The pre-set agreement rule of scripts/09 (rank correlation >= 0.9 and median |relative
    difference| < 3%) is still reported, as fails / agrees / undecided from its intervals.
-   Intervals: corridor cluster bootstrap when n >= 20; for smaller n, the exact order-statistic
-   interval of each median and no interval for the rank correlation.
+   Intervals: corridor cluster bootstrap when n >= 20; for smaller n, the order-statistic interval
+   of each median and no interval for the rank correlation. That interval is exact only for
+   independent pairs; the number of corridors is reported next to it, because pairs on the same
+   corridor are not independent and the real interval is then wider.
 4. Everything is reported for all pairs and for "credible" bottlenecks, defined on physical grounds
    only: both detectors >= 75% observed, no off-ramp between them, the episode starting between 05:00
    and 21:00, and the pair active (with episodes meeting those three conditions) on at least 3 of
@@ -44,7 +46,7 @@ DAYTIME = (5 * 12, 21 * 12)      # episode must start between 05:00 and 21:00 (5
 MIN_DAYS_ACTIVE = 3              # recurrent bottleneck: active on at least 3 of the 7 days
 PEAK_HOURS = ((6, 10), (15, 19))
 N_BOOT = 2000
-MIN_N_BOOTSTRAP = 20             # below this, exact order-statistic intervals for medians
+MIN_N_BOOTSTRAP = 20             # below this, order-statistic intervals for medians (independent pairs)
 
 use_style()
 cal = pd.read_csv(paths.RESULTS / "calibration.csv")
@@ -135,7 +137,7 @@ def compare(b, col, rng):
     model/measured ratio and median |relative difference| with 95% intervals, and the three-valued
     verdict of the pre-set agreement rule."""
     d = b.dropna(subset=[col]).reset_index(drop=True)
-    out = dict(n=len(d))
+    out = dict(n=len(d), corridors=int(d["corridor"].nunique()))
     if len(d) < 3:
         return out
     m, x = d[col].to_numpy(), d["measured_discharge"].to_numpy()
@@ -153,10 +155,10 @@ def compare(b, col, rng):
                           for _ in range(N_BOOT)])
         lo, hi = np.nanpercentile(boots, [2.5, 97.5], axis=0)
         out["interval"] = "corridor bootstrap"
-    else:                                              # exact order-statistic intervals for the medians
+    else:                                              # order-statistic intervals, assuming independent pairs
         (r_lo, r_hi), (a_lo, a_hi) = median_interval(r), median_interval(np.abs(r - 1))
         lo, hi = np.array([np.nan, r_lo, a_lo]), np.array([np.nan, r_hi, a_hi])
-        out["interval"] = "exact order statistic (median); none for rank correlation"
+        out["interval"] = "order statistic (median), assumes independent pairs; none for rank correlation"
     for j, name in enumerate(["spearman", "ratio", "abs_rel_diff"]):
         out.update({name: point[j], f"{name}_lo": lo[j], f"{name}_hi": hi[j]})
     if hi[0] < 0.9 or lo[2] >= 0.03:
